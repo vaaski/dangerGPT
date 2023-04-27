@@ -1,5 +1,5 @@
 {
-  "name": "dangerGPT",
+  "name": "dangergpt",
   "version": "0.0.0",
   "description": "",
   "type": "module",
@@ -8,13 +8,14 @@
   "license": "MIT",
   "scripts": {
     "test": "echo \"no tests\"",
-    "start": "tsx ./src/index.ts",
+    "start": "tsx -r dotenv/config ./src/index.ts",
     "dev": "nodemon ./src/index.ts",
     "format": "prettier --write .",
     "lint": "eslint ."
   },
   "devDependencies": {
     "@types/node": "^18.16.1",
+    "@types/prompts": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "eslint": "^8.39.0",
@@ -28,6 +29,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "openai": "^3.2.1"
+    "openai": "^3.2.1",
+    "prompts": "^2.4.2"
   }
 }

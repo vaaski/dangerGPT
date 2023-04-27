@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from "openai"
+import prompts from "prompts"
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set")
@@ -8,15 +9,48 @@ const configuration = new Configuration({
 })
 const openai = new OpenAIApi(configuration)
 
-const completion = await openai.createChatCompletion({
-  model: "gpt-3.5-turbo",
-  messages: [
-    {
-      role: "user",
-      content: `This is a test. Reply with 'longus amongus' and nothing else.`,
-    },
-  ],
-})
-console.log(completion.data.choices[0].message)
+const pretext = `
+assume the user wants to run any code in the current directory.
+generate necessary python code to solve the following problem:
+`
+
+const pythonCodeBlockRegex = /```(?:python)?([\S\s]+)```/
+const getCodeFromMarkdown = (inputString: string) => {
+  const match = inputString.match(pythonCodeBlockRegex)
+  if (!match) return inputString
+  return match[1]
+}
+
+try {
+  const response = await prompts({
+    type: "text",
+    name: "value",
+    message: "What problem would you like to solve with code?",
+    validate: Boolean,
+  })
+
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content:
+          "you're a code-generator. do not explain anything, just return the code.",
+      },
+      {
+        role: "user",
+        content: pretext + response.value,
+      },
+    ],
+  })
+
+  const message = completion.data.choices[0].message
+  if (!message) throw new Error("No message returned from OpenAI")
+
+  console.log(message)
+  console.log(getCodeFromMarkdown(message.content))
+} catch (error) {
+  console.error(error)
+}
 
 export {}
