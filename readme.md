@@ -5,3 +5,4 @@
 
 ![shutdown.png](examples/shutdown.png)
 ![goat.png](examples/goat.png)
+![delete.png](examples/delete.png)
