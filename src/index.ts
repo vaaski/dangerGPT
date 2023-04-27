@@ -1,3 +1,4 @@
+import { execa } from "execa"
 import { Configuration, OpenAIApi } from "openai"
 import prompts from "prompts"
 
@@ -47,8 +48,12 @@ try {
   const message = completion.data.choices[0].message
   if (!message) throw new Error("No message returned from OpenAI")
 
-  console.log(message)
+  console.log("executing:")
   console.log(getCodeFromMarkdown(message.content))
+
+  await execa("python", ["-c", getCodeFromMarkdown(message.content)], {
+    stdio: "inherit",
+  })
 } catch (error) {
   console.error(error)
 }
