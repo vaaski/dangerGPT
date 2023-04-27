@@ -23,12 +23,19 @@ const getCodeFromMarkdown = (inputString: string) => {
 }
 
 try {
-  const response = await prompts({
-    type: "text",
-    name: "value",
-    message: "What problem would you like to solve with code?",
-    validate: Boolean,
-  })
+  let argumentParameter = process.argv.slice(2).join(" ").trim()
+
+  if (!argumentParameter) {
+    const response = await prompts({
+      type: "text",
+      name: "value",
+      message: "What problem would you like to solve with code?",
+      validate: Boolean,
+    })
+
+    if (!response.value) throw new Error("No response from prompts")
+    argumentParameter = response.value
+  }
 
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
@@ -40,7 +47,7 @@ try {
       },
       {
         role: "user",
-        content: pretext + response.value,
+        content: pretext + argumentParameter,
       },
     ],
   })
